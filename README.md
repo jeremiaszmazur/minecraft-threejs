@@ -1,6 +1,8 @@
-# minecraft-threejs-clone
+# minecraft-threejs
 
-This is a simple Minecraft clone written with 🍦 Vanilla JavaScript + Three.js.
+This is a clone of simple Minecraft clone written with 🍦 Vanilla JavaScript + Three.js.
+
+This clone have a texture loader from original resourcepack.
 
 ![Screenshot 2023-09-29 at 12 14 34 AM](https://github.com/dgreenheck/minecraft-threejs-clone/assets/3814912/c39c6b2a-f6e4-4f43-824c-d0e727539170)
 
