@@ -1,27 +1,5 @@
 import * as THREE from 'three';
-
-const textureLoader = new THREE.TextureLoader();
-
-function loadTexture(path) {
-  const texture = textureLoader.load(path);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.magFilter = THREE.NearestFilter;
-  texture.minFilter = THREE.NearestFilter;
-  return texture;
-}
-
-const textures = {
-  dirt: loadTexture('textures/dirt.png'),
-  grass: loadTexture('textures/grass.png'),
-  grassSide: loadTexture('textures/grass_side.png'),
-  stone: loadTexture('textures/stone.png'),
-  coalOre: loadTexture('textures/coal_ore.png'),
-  ironOre: loadTexture('textures/iron_ore.png'),
-  leaves: loadTexture('textures/leaves.png'),
-  treeSide: loadTexture('textures/tree_side.png'),
-  treeTop: loadTexture('textures/tree_top.png'),
-  sand: loadTexture('textures/sand.png')
-};
+import { textures } from './textures'
 
 export const blocks = {
   empty: {
