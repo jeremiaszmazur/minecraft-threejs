@@ -3,7 +3,11 @@
 */
 export default {
   base: '/minecraft-threejs-clone/',
+  optimizeDeps: {
+    include: ['eslint'],
+  },
   build: {
-    sourcemap: true
+    sourcemap: true,
+    target: 'esnext',
   }
 }
