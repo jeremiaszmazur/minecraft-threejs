@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 
 function loadTexture(file, filetype = '.png', resourcepack = 'VanillaDefault') {
