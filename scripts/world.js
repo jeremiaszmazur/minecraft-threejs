@@ -153,8 +153,8 @@ export class World extends THREE.Group {
     const chunksToRemove = this.children.filter((obj) => {
       const { x, z } = obj.userData;
       const chunkExists = visibleChunks.find((visibleChunk) => {
-          return visibleChunk.x === x && visibleChunk.z === z;
-        });
+        return visibleChunk.x === x && visibleChunk.z === z;
+      });
 
       return !chunkExists;
     })
@@ -334,8 +334,8 @@ export class World extends THREE.Group {
   save() {
     localStorage.setItem('minecraft_params', JSON.stringify(this.params));
     localStorage.setItem('minecraft_data', JSON.stringify(this.dataStore.data));
-    document.getElementById('status').innerText = "Game Saved";
-    setTimeout(() => document.getElementById('status').innerText = "", 3000);
+    document.getElementById('status').innerText = 'Game Saved';
+    setTimeout(() => document.getElementById('status').innerText = '', 3000);
   }
 
   /**
@@ -344,8 +344,8 @@ export class World extends THREE.Group {
   load() {
     this.params = JSON.parse(localStorage.getItem('minecraft_params'));
     this.dataStore.data = JSON.parse(localStorage.getItem('minecraft_data'));
-    document.getElementById('status').innerText = "Game Loaded";
-    setTimeout(() => document.getElementById('status').innerText = "", 3000);
+    document.getElementById('status').innerText = 'Game Loaded';
+    setTimeout(() => document.getElementById('status').innerText = '', 3000);
     this.regenerate();
   }
 }

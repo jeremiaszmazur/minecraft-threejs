@@ -241,7 +241,7 @@ export class WorldChunk extends THREE.Group {
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         meshes[blockType.id] = mesh;
-    });
+      });
 
     // Add instances for each non-empty block
     const matrix = new THREE.Matrix4();
