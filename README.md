@@ -1,6 +1,6 @@
 # minecraft-threejs
 
-This is a clone of simple Minecraft clone written with 🍦 Vanilla JavaScript + Three.js.
+This is a fork of https://github.com/dgreenheck/minecraft-threejs-clone
 
 The project includes a block picker (accessible via keys 9, E, Q) and a texture loader that utilizes resources from the original resource pack.
 
