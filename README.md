@@ -22,7 +22,8 @@ You sure can! I created a tutorial video series on my YouTube channel which you 
 
 ## Features
 - Procedural World Generation
-- Resources (Coal and Iron)
+- Resources (from original game)
+- Item picker
 - Terrain Chunking
 - Terraforming
 - Save/Load
@@ -33,3 +34,4 @@ You sure can! I created a tutorial video series on my YouTube channel which you 
 - More block types
 - Item drops
 - NPCs
+- Multiplayer
