@@ -2,9 +2,11 @@
 
 This is a clone of simple Minecraft clone written with 🍦 Vanilla JavaScript + Three.js.
 
-This clone have a texture loader from original resourcepack.
+The project includes a block picker (accessible via keys 9, E, Q) and a texture loader that utilizes resources from the original resource pack.
 
-![Screenshot 2023-09-29 at 12 14 34 AM](https://github.com/dgreenheck/minecraft-threejs-clone/assets/3814912/c39c6b2a-f6e4-4f43-824c-d0e727539170)
+![Menu Screenshot](/screenshots/0.png?raw=true "Menu Screenshot")
+
+![Game Screenshot](/screenshots/1.png?raw=true "Menu Screenshot")
 
 ## Live Demo
 

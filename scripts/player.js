@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { World } from './world';
 import { blocks } from './blocks';
+import { materials } from './materials'
 
 const CENTER_SCREEN = new THREE.Vector2();
 
@@ -22,7 +23,8 @@ export class Player {
   raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(), 0, 3);
   selectedCoords = null;
   activeBlockId = blocks.empty.id;
-  
+  extraBlockId = 579;
+
   tool = {
     // Group that will contain the tool mesh
     container: new THREE.Group(),
@@ -45,7 +47,7 @@ export class Player {
 
     // Hide/show instructions based on pointer controls locking/unlocking
     this.controls.addEventListener('lock', function () {
-      console.log('locked');
+      // console.log('locked');
       document.getElementById('overlay').style.visibility = 'hidden';
     });
 
@@ -84,7 +86,13 @@ export class Player {
     document.addEventListener('keydown', this.onKeyDown.bind(this));
     document.addEventListener('mousedown', this.onMouseDown.bind(this));
   }
-  
+
+  toggleInventory() {
+    let itemId = prompt('Please insert item id', '579');
+    this.extraBlockId = itemId
+    this.activeBlockId = Number(this.extraBlockId)
+  }
+
   /**
    * Updates the state of the player
    * @param {World} world 
@@ -105,7 +113,7 @@ export class Player {
   updateRaycaster(world) {
     this.raycaster.setFromCamera(CENTER_SCREEN, this.camera);
     const intersections = this.raycaster.intersectObject(world, true);
-  
+
     if (intersections.length > 0) {
       const intersection = intersections[0];
 
@@ -153,7 +161,7 @@ export class Player {
         this.velocity.y = 0;
       }
     }
-    
+
     document.getElementById('info-player-position').innerHTML = this.toString();
   }
 
@@ -174,7 +182,7 @@ export class Player {
     this.tool.container.add(tool);
     this.tool.container.receiveShadow = true;
     this.tool.container.castShadow = true;
-  
+
     this.tool.container.position.set(0.6, -0.3, -0.5);
     this.tool.container.scale.set(0.5, 0.5, 0.5);
     this.tool.container.rotation.z = Math.PI / 2;
@@ -236,6 +244,9 @@ export class Player {
       case 'KeyD':
         this.input.x = 0;
         break;
+      case 'KeyE':
+        this.toggleInventory()
+        break;
     }
   }
 
@@ -258,15 +269,25 @@ export class Player {
       case 'Digit6':
       case 'Digit7':
       case 'Digit8':
-      // Update the selected toolbar icon
+        // Update the selected toolbar icon
         document.getElementById(`toolbar-${this.activeBlockId}`)?.classList.remove('selected');
         document.getElementById(`toolbar-${event.key}`)?.classList.add('selected');
+        document.getElementById('toolbar').classList.remove('toolbar-extra')
 
         this.activeBlockId = Number(event.key);
 
         // Update the pickaxe visibility
         this.tool.container.visible = (this.activeBlockId === 0);
 
+        break;
+      case 'Digit9':
+        this.activeBlockId = Number(this.extraBlockId)
+        document.querySelectorAll('.toolbar-icon').forEach(element => {
+          element.classList.remove('selected')
+        });
+        document.getElementById('toolbar').classList.add('toolbar-extra')
+        // Update the visibility
+        this.tool.container.visible = (this.activeBlockId === 0);
         break;
       case 'KeyW':
         this.input.z = this.maxSpeed;
@@ -289,6 +310,10 @@ export class Player {
         if (this.onGround) {
           this.velocity.y += this.jumpSpeed;
         }
+        break;
+      case 'KeyQ':
+        console.log(Object.keys(blocks).map((blockId) => `${blocks[blockId].id} -> ${blocks[blockId].name}`).join('\n'))
+        alert(Object.keys(blocks).slice(-22).map((blockId) => `${blocks[blockId].id} -> ${blocks[blockId].name}`).join('\n') + '\n ... show more in dev tools (F12)')
         break;
     }
   }

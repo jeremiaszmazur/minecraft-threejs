@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { materials } from './materials'
 
 export const blocks = {
+  ...materials,
   empty: {
     id: 0,
     name: 'empty',

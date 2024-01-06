@@ -11,7 +11,7 @@ export class World extends THREE.Group {
    * the adjacent chunks are rendered; if set to 2, the
    * chunks adjacent to those are rendered, and so on.
    */
-  drawDistance = 3;
+  drawDistance = 2;
 
   /**
    * If true, chunks are loaded asynchronously.
@@ -22,7 +22,7 @@ export class World extends THREE.Group {
    * Width and height of a single chunk of terrain
    */
   chunkSize = {
-    width: 32,
+    width: 8,
     height: 24
   }
 

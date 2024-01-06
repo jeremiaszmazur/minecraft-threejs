@@ -55,14 +55,13 @@ export function setupUI(world, player, physics, scene) {
   cloudsFolder.add(world.params.clouds, 'density', 0, 1).name('Density');
   cloudsFolder.add(world.params.clouds, 'scale', 1, 100, 1).name('Scale');
 
-  worldFolder.onFinishChange((event) => {
+  worldFolder.onFinishChange(() => {
     world.regenerate(player);
   });
 
   document.addEventListener('keydown', (event) => {
-    console.log(event);
     if (event.code === 'KeyU') {
-      console.log(gui._hidden);
+    //   console.log(gui._hidden);
       if (gui._hidden) {
         gui.show();
       } else {

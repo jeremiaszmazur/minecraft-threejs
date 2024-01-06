@@ -8,7 +8,7 @@ function loadTexture(file, filetype = '.png', resourcepack = 'VanillaDefault') {
   textureLoader.load(
     path,
     texture => {
-      console.log('Loaded:', texture);
+    //   console.log('Loaded:', texture);
     },
     xhr => {
       console.error('Texture not found:', xhr);

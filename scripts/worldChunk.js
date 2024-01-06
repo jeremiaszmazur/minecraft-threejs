@@ -19,7 +19,8 @@ export class WorldChunk extends THREE.Group {
     this.size = size;
     this.params = params;
     this.dataStore = dataStore;
-    this.loaded = false; 
+    this.loaded = false;
+    this.visibleMeshes = [];
   }
 
   /**
@@ -74,8 +75,8 @@ export class WorldChunk extends THREE.Group {
         for (let y = 0; y < this.size.height; y++) {
           for (let z = 0; z < this.size.width; z++) {
             const n = simplex.noise3d(
-              (this.position.x + x) / resource.scale.x, 
-              (this.position.y + y) / resource.scale.y, 
+              (this.position.x + x) / resource.scale.x,
+              (this.position.y + y) / resource.scale.y,
               (this.position.z + z) / resource.scale.z);
 
             if (n > resource.scarcity) {
@@ -110,17 +111,17 @@ export class WorldChunk extends THREE.Group {
 
         // Clamp between 0 and max height
         height = Math.max(0, Math.min(Math.floor(height), this.size.height - 1));
-        
+
         // Starting at the terrain height, fill in all the blocks below that height
         for (let y = 0; y < this.size.height; y++) {
           if (y <= this.params.terrain.waterHeight && y <= height) {
             this.setBlockId(x, y, z, blocks.sand.id);
           } else if (y === height) {
             this.setBlockId(x, y, z, blocks.grass.id);
-          // Fill in blocks with dirt if they aren't already filled with something else
+            // Fill in blocks with dirt if they aren't already filled with something else
           } else if (y < height && this.getBlock(x, y, z).id === blocks.empty.id) {
             this.setBlockId(x, y, z, blocks.dirt.id);
-          // Clear everything above
+            // Clear everything above
           } else if (y > height) {
             this.setBlockId(x, y, z, blocks.empty.id);
           }
@@ -196,7 +197,7 @@ export class WorldChunk extends THREE.Group {
         const value = simplex.noise(
           (this.position.x + x) / this.params.clouds.scale,
           (this.position.z + z) / this.params.clouds.scale) * 0.5 + 0.5;
-  
+
         if (value < this.params.clouds.density) {
           this.setBlockId(x, this.size.height - 1, z, blocks.cloud.id);
         }
@@ -226,22 +227,25 @@ export class WorldChunk extends THREE.Group {
    */
   generateMeshes() {
     this.disposeChildren();
-    
+
     this.generateWater();
 
     // Create lookup table of InstancedMesh's with the block id being the key
     const meshes = {};
+
+    function createMeshForBlock(blockType) {
+      const maxCount = this.size.width * this.size.width * this.size.height;
+      const mesh = new THREE.InstancedMesh(geometry, blockType.material, maxCount);
+      mesh.name = blockType.id;
+      mesh.count = 0;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      meshes[blockType.id] = mesh;
+    }
+
+    // Creating meshes only for blocks that are not empty
     Object.values(blocks)
-      .filter((blockType) => blockType.id !== blocks.empty.id)
-      .forEach((blockType) => {
-        const maxCount = this.size.width * this.size.width * this.size.height;
-        const mesh = new THREE.InstancedMesh(geometry, blockType.material, maxCount);
-        mesh.name = blockType.id;
-        mesh.count = 0;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        meshes[blockType.id] = mesh;
-      });
+      .forEach(createMeshForBlock.bind(this))
 
     // Add instances for each non-empty block
     const matrix = new THREE.Matrix4();
@@ -255,7 +259,7 @@ export class WorldChunk extends THREE.Group {
 
           const mesh = meshes[blockId];
           const instanceId = mesh.count;
-
+          
           // Create a new instance if block is not obscured by other blocks
           if (!this.isBlockObscured(x, y, z)) {
             matrix.setPosition(x, y, z);
@@ -290,8 +294,8 @@ export class WorldChunk extends THREE.Group {
     );
     waterMesh.scale.set(this.size.width, this.size.width, 1);
     waterMesh.layers.set(1);
-    
-    this.add(waterMesh);   
+
+    this.add(waterMesh);
   }
 
   /**
@@ -305,6 +309,7 @@ export class WorldChunk extends THREE.Group {
     // Safety check that we aren't adding a block for one that
     // already has an instance
     if (this.getBlock(x, y, z).id === blocks.empty.id) {
+      this.visibleMeshes.push(blockId);
       this.setBlockId(x, y, z, blockId);
       this.addBlockInstance(x, y, z);
       this.dataStore.set(this.position.x, this.position.z, x, y, z, blockId);
@@ -411,7 +416,7 @@ export class WorldChunk extends THREE.Group {
       return null;
     }
   }
-  
+
 
   /**
    * Sets the block id for the block at (x, y, z)
@@ -425,7 +430,7 @@ export class WorldChunk extends THREE.Group {
       this.data[x][y][z].id = id;
     }
   }
-  
+
 
   /**
    * Sets the block instance id for the block at (x, y, z)
@@ -439,7 +444,7 @@ export class WorldChunk extends THREE.Group {
       this.data[x][y][z].instanceId = instanceId;
     }
   }
-  
+
   /**
    * Checks if the (x, y, z) coordinates are within bounds
    * @param {number} x 
@@ -451,7 +456,7 @@ export class WorldChunk extends THREE.Group {
     if (x >= 0 && x < this.size.width &&
       y >= 0 && y < this.size.height &&
       z >= 0 && z < this.size.width) {
-      return true; 
+      return true;
     } else {
       return false;
     }
@@ -471,14 +476,14 @@ export class WorldChunk extends THREE.Group {
     const right = this.getBlock(x - 1, y, z)?.id ?? blocks.empty.id;
     const forward = this.getBlock(x, y, z + 1)?.id ?? blocks.empty.id;
     const back = this.getBlock(x, y, z - 1)?.id ?? blocks.empty.id;
-  
+
     // If any of the block's sides is exposed, it is not obscured
     if (up === blocks.empty.id ||
-        down === blocks.empty.id || 
-        left === blocks.empty.id || 
-        right === blocks.empty.id || 
-        forward === blocks.empty.id || 
-        back === blocks.empty.id) {
+      down === blocks.empty.id ||
+      left === blocks.empty.id ||
+      right === blocks.empty.id ||
+      forward === blocks.empty.id ||
+      back === blocks.empty.id) {
       return false;
     } else {
       return true;

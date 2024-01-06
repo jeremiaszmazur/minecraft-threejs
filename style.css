@@ -53,6 +53,10 @@ h1 {
   outline: 4px solid white;
 }
 
+.toolbar-extra {
+  background-color: #2196F3 !important;
+}
+
 #overlay {
   position: fixed;
   top: 0;
