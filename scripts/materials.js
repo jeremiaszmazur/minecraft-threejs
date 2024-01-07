@@ -26,16 +26,16 @@ const loadMaterials = () => {
   let materials = {}
 
   Object.entries(files).forEach(([filePath, fileContent], index) => {
+    const modelName = filePath.replace('../resourcepacks/VanillaDefault/assets/minecraft/models/block/', '').replace('.json', '')
+    const modelType = fileContent?.parent?.replace('minecraft:','') || ''
     const getFaceMaterial = (face) => {
       const texture = fileContent.textures[face.texture.replace('#','')]
       if (!texture) {
-        console.warn('Failed load texture face', face)
+        console.warn(`Failed load "${modelName}" (${modelType}) texture face`, face)
         return new THREE.MeshBasicMaterial({color: 0xFFFFFF})
       }
       return new THREE.MeshLambertMaterial({ map: loadTexture(texture) })
     }
-    const modelName = filePath.replace('../resourcepacks/VanillaDefault/assets/minecraft/models/block/', '').replace('.json', '')
-    const modelType = fileContent?.parent?.replace('minecraft:','') || ''
     if (modelType == 'block/cube_all' || modelType === 'block/block') {
       if (fileContent?.textures) {
         const faces = fileContent.elements?.length ? fileContent.elements[0].faces || {} : {}

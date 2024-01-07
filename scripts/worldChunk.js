@@ -21,6 +21,8 @@ export class WorldChunk extends THREE.Group {
     this.dataStore = dataStore;
     this.loaded = false;
     this.visibleMeshes = [];
+    this.visibleBlocks = [];
+    this.newBlockId = '';
   }
 
   /**
@@ -236,6 +238,7 @@ export class WorldChunk extends THREE.Group {
     function createMeshForBlock(blockType) {
       const maxCount = this.size.width * this.size.width * this.size.height;
       const mesh = new THREE.InstancedMesh(geometry, blockType.material, maxCount);
+      
       mesh.name = blockType.id;
       mesh.count = 0;
       mesh.castShadow = true;
@@ -243,8 +246,33 @@ export class WorldChunk extends THREE.Group {
       meshes[blockType.id] = mesh;
     }
 
+    this.visibleBlocks = []
+    if (this.newBlockId) {
+      this.visibleBlocks.push(this.newBlockId)
+      this.newBlockId = ''
+    }
+    for (let x = 0; x < this.size.width; x++) {
+      for (let y = 0; y < this.size.height; y++) {
+        for (let z = 0; z < this.size.width; z++) {
+          const blockId = this.getBlock(x, y, z).id;
+
+          // Ignore pushed blocks
+          if (this.visibleBlocks.includes(blockId)) continue;
+
+          // Ignore empty blocks
+          if (blockId === blocks.empty.id) continue;
+          
+          // Create a new instance if block is not obscured by other blocks
+          if (!this.isBlockObscured(x, y, z)) {
+            this.visibleBlocks.push(blockId)
+          }
+        }
+      }
+    }
+
     // Creating meshes only for blocks that are not empty
     Object.values(blocks)
+      .filter(block => this.visibleBlocks.includes(block.id))
       .forEach(createMeshForBlock.bind(this))
 
     // Add instances for each non-empty block
@@ -308,6 +336,23 @@ export class WorldChunk extends THREE.Group {
   addBlock(x, y, z, blockId) {
     // Safety check that we aren't adding a block for one that
     // already has an instance
+    if (!this.visibleBlocks.includes(blockId)) {
+      const maxCount = this.size.width * this.size.width * this.size.height;
+      const blockSlug = Object.keys(blocks).find((blockKey) => blocks[blockKey].id === blockId)
+      if (!blockSlug) {
+        console.error('Can not add block to scene because material not found')
+        return
+      }
+      const mesh = new THREE.InstancedMesh(geometry, blocks[blockSlug].material, maxCount);
+        
+      mesh.name = blockId;
+      mesh.count = 0;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      // Add all instanced meshes to the scene
+      this.add(mesh);
+    }
     if (this.getBlock(x, y, z).id === blocks.empty.id) {
       this.visibleMeshes.push(blockId);
       this.setBlockId(x, y, z, blockId);

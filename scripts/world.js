@@ -22,7 +22,7 @@ export class World extends THREE.Group {
    * Width and height of a single chunk of terrain
    */
   chunkSize = {
-    width: 8,
+    width: 6,
     height: 24
   }
 
